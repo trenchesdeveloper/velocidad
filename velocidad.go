@@ -1,4 +1,4 @@
-package celeritas
+package velocidad
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 const Version = "1.0.0"
 
-type Celeritas struct {
+type Velocidad struct {
 	AppName  string
 	Debug    bool
 	Version  string
@@ -20,7 +20,7 @@ type Celeritas struct {
 	RootPath string
 }
 
-func (c *Celeritas) New(rootPath string) error {
+func (v *Velocidad) New(rootPath string) error {
 	pathConfig := initPaths{
 		rootPath: rootPath,
 		folderNames: []string{
@@ -35,14 +35,14 @@ func (c *Celeritas) New(rootPath string) error {
 		},
 	}
 
-	err := c.Init(pathConfig)
+	err := v.Init(pathConfig)
 
 	if err != nil {
 		return err
 	}
 
 	// check if dotenv file exists
-	err = c.checkDotEnv(rootPath)
+	err = v.checkDotEnv(rootPath)
 
 	if err != nil {
 		return err
@@ -56,22 +56,22 @@ func (c *Celeritas) New(rootPath string) error {
 	}
 
 	// create loggers
-	infoLog, errorLog := c.StartLoggers()
+	infoLog, errorLog := v.StartLoggers()
 
-	c.InfoLog = infoLog
-	c.ErrorLog = errorLog
-	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	c.Version = Version
+	v.InfoLog = infoLog
+	v.ErrorLog = errorLog
+	v.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	v.Version = Version
 
 	return nil
 }
 
-func (c *Celeritas) Init(p initPaths) error {
+func (v *Velocidad) Init(p initPaths) error {
 	root := p.rootPath
 
 	for _, folder := range p.folderNames {
 		// Create folders if it doesn't exist
-		err := c.CreateDirIfNotExist(root + "/" + folder)
+		err := v.CreateDirIfNotExist(root + "/" + folder)
 
 		if err != nil {
 			return err
@@ -81,9 +81,9 @@ func (c *Celeritas) Init(p initPaths) error {
 	return nil
 }
 
-func (c *Celeritas) checkDotEnv(rootPath string) error {
+func (v *Velocidad) checkDotEnv(rootPath string) error {
 	// check if dotenv file exists
-	err := c.CreateFileIfNotExist(fmt.Sprintf("%s/.env", rootPath))
+	err := v.CreateFileIfNotExist(fmt.Sprintf("%s/.env", rootPath))
 
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (c *Celeritas) checkDotEnv(rootPath string) error {
 	return nil
 }
 
-func (c *Celeritas) StartLoggers() (*log.Logger, *log.Logger) {
+func (v *Velocidad) StartLoggers() (*log.Logger, *log.Logger) {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 

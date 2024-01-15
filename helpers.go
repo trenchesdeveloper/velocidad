@@ -1,8 +1,8 @@
-package celeritas
+package velocidad
 
 import "os"
 
-func (c *Celeritas) CreateDirIfNotExist(path string) error {
+func (v *Velocidad) CreateDirIfNotExist(path string) error {
 	const mode = 0755
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		err := os.MkdirAll(path, mode)
@@ -13,7 +13,7 @@ func (c *Celeritas) CreateDirIfNotExist(path string) error {
 	return nil
 }
 
-func (c *Celeritas) CreateFileIfNotExist(path string) error {
+func (v *Velocidad) CreateFileIfNotExist(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		file, err := os.Create(path)
 		if err != nil {

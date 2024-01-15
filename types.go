@@ -1,4 +1,4 @@
-package celeritas
+package velocidad
 
 type initPaths struct {
 	rootPath    string
