@@ -18,6 +18,13 @@ type Velocidad struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	config   config
+}
+
+type config struct {
+	port     string
+	renderer string // template engine
+
 }
 
 func (v *Velocidad) New(rootPath string) error {
@@ -62,6 +69,12 @@ func (v *Velocidad) New(rootPath string) error {
 	v.ErrorLog = errorLog
 	v.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	v.Version = Version
+	v.RootPath = rootPath
+
+	v.config = config{
+		port:     os.Getenv("PORT"),
+		renderer: os.Getenv("RENDERER"),
+	}
 
 	return nil
 }
