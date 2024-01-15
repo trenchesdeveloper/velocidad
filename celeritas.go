@@ -2,6 +2,9 @@ package celeritas
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -9,9 +12,12 @@ import (
 const Version = "1.0.0"
 
 type Celeritas struct {
-	AppName string
-	Debug   bool
-	Version string
+	AppName  string
+	Debug    bool
+	Version  string
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+	RootPath string
 }
 
 func (c *Celeritas) New(rootPath string) error {
@@ -49,6 +55,14 @@ func (c *Celeritas) New(rootPath string) error {
 		return err
 	}
 
+	// create loggers
+	infoLog, errorLog := c.StartLoggers()
+
+	c.InfoLog = infoLog
+	c.ErrorLog = errorLog
+	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	c.Version = Version
+
 	return nil
 }
 
@@ -76,4 +90,11 @@ func (c *Celeritas) checkDotEnv(rootPath string) error {
 	}
 
 	return nil
+}
+
+func (c *Celeritas) StartLoggers() (*log.Logger, *log.Logger) {
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	return infoLog, errorLog
 }
