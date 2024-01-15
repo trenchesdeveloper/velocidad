@@ -3,9 +3,12 @@ package velocidad
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 )
 
@@ -18,6 +21,7 @@ type Velocidad struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	Routes   *chi.Mux
 	config   config
 }
 
@@ -70,6 +74,7 @@ func (v *Velocidad) New(rootPath string) error {
 	v.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	v.Version = Version
 	v.RootPath = rootPath
+	v.Routes = v.routes().(*chi.Mux)
 
 	v.config = config{
 		port:     os.Getenv("PORT"),
@@ -77,6 +82,28 @@ func (v *Velocidad) New(rootPath string) error {
 	}
 
 	return nil
+}
+
+// ListenAndServe starts the HTTP server and listens for incoming requests.
+// It creates an instance of http.Server with the specified address, handler,
+// error log, idle timeout, read timeout, and write timeout.
+// It then starts the server and logs the port it is listening on.
+// If an error occurs while starting the server, it logs the error and exits the program.
+func (v *Velocidad) ListenAndServe() {
+	srv := &http.Server{
+		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
+		Handler:      v.routes(),
+		ErrorLog:     v.ErrorLog,
+		IdleTimeout:  30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 600 * time.Second,
+	}
+
+	v.InfoLog.Printf("Starting server on port %s", os.Getenv("PORT"))
+
+	err := srv.ListenAndServe()
+
+	v.ErrorLog.Fatal(err)
 }
 
 func (v *Velocidad) Init(p initPaths) error {
